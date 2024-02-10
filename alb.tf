@@ -1,13 +1,13 @@
-module "sonarcube-alb" {
+module "sonarqube-alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "7.0.0"
 
-  name = "sonarcube"
+  name = "${var.app_name}-alb"
 
   load_balancer_type = "application"
 
-  vpc_id          = module.sonarcube-vpc.vpc_id
-  subnets         = module.sonarcube-vpc.public_subnets
+  vpc_id          = module.sonarqube-vpc.vpc_id
+  subnets         = module.sonarqube-vpc.public_subnets
   security_groups = [module.lb_sg.security_group_id]
 
   enable_deletion_protection = true
@@ -56,7 +56,7 @@ module "sonarcube-alb" {
       port     = 443
       protocol = "HTTPS"
       #certificate_arn             = data.aws_acm_certificate.cert.arn
-      certificate_arn    = aws_acm_certificate.sonarcube-acm.arn
+      certificate_arn    = aws_acm_certificate.sonarqube-acm.arn
       ssl_policy         = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
       target_group_index = 0
     }
@@ -64,7 +64,7 @@ module "sonarcube-alb" {
 }
 
 resource "aws_wafv2_web_acl_association" "waf" {
-  resource_arn = module.sonarcube-alb.lb_arn
-  web_acl_arn  = aws_wafv2_web_acl.sonarcube-waf.arn
+  resource_arn = module.sonarqube-alb.lb_arn
+  web_acl_arn  = aws_wafv2_web_acl.sonarqube-waf.arn
 }
 

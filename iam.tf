@@ -8,7 +8,7 @@ module "ecs_execution_role" {
 
   create_role = true
 
-  role_name         = "ecs-ExecutionRole"
+  role_name         = "${var.app_name}-ecs-ExecutionRole"
   role_requires_mfa = false
 
   custom_role_policy_arns = [

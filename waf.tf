@@ -1,7 +1,15 @@
+resource "aws_wafv2_ip_set" "sonarqube_ip" {
+  name               = "${var.app_name}-IP-Set"
+  description        = "Allowed IP range"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = ["0.0.0.0/1", "128.0.0.0/1"]
+}
 
-resource "aws_wafv2_web_acl" "sonarcube-waf" {
-  name        = "sonarcube-waf"
-  description = "Waf for sonarcube"
+
+resource "aws_wafv2_web_acl" "sonarqube-waf" {
+  name        = "${var.app_name}-waf"
+  description = "Waf for sonarqube"
   scope       = "REGIONAL"
 
   default_action {
@@ -49,23 +57,45 @@ resource "aws_wafv2_web_acl" "sonarcube-waf" {
       }
     }
   }
+ 
+   rule {
+    name     = "${var.app_name}-Allow-List"
+    priority = 0
+
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.sonarqube_ip.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "${var.app_name}-allow-list"
+      sampled_requests_enabled   = false
+    }
+  }
+
 
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "sonarcube-waf"
+    metric_name                = "${var.app_name}-waf"
     sampled_requests_enabled   = true
   }
 }
 
-resource "aws_cloudwatch_log_group" "sonarcube-waf" {
-  name              = "aws-waf-logs-sonarcube-waf"
+resource "aws_cloudwatch_log_group" "sonarqube-waf" {
+  name              = "aws-waf-logs-${var.app_name}-waf"
   retention_in_days = 60
 }
 
 
-resource "aws_wafv2_web_acl_logging_configuration" "sonarcube-waf" {
-  log_destination_configs = [aws_cloudwatch_log_group.sonarcube-waf.arn]
-  resource_arn            = aws_wafv2_web_acl.sonarcube-waf.arn
+resource "aws_wafv2_web_acl_logging_configuration" "sonarqube-waf" {
+  log_destination_configs = [aws_cloudwatch_log_group.sonarqube-waf.arn]
+  resource_arn            = aws_wafv2_web_acl.sonarqube-waf.arn
 }
 

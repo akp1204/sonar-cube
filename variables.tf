@@ -1,5 +1,19 @@
 variable "domain_name" {
-  default = "927827734038.realhandsonlabs.net"
+  default = "sonarqube.net" // Test Domainname
+}
+
+
+variable "app_name" {
+  default = "sonarqube"
+}
+
+variable "sonar_db_username" {
+  default = "sonar"
+}
+
+
+variable "sonar_db_name" {
+  default = "sonar"
 }
 
 variable "managed_rules" {

@@ -1,9 +1,0 @@
-terraform {
-  backend "s3" {
-    bucket         = "nhsbsa-845930604129-citizen-terraform"
-    key            = "hs/infrastructure.tfstate"
-    dynamodb_table = "terraform_state"
-    region         = "eu-west-2"
-  }
-}
-
